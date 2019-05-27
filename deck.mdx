@@ -1,0 +1,248 @@
+import {
+	Split,
+	Invert,
+	Horizontal,
+} from '@mdx-deck/layouts'
+import { 
+	Notes, 
+	Head,
+} from 'mdx-deck'
+import Box from '@mdx-deck/layouts/src/Box'
+import highlight from '@mdx-deck/themes/syntax-highlighter-prism'
+
+import { Section, Title, FullScreen } from 'src/section'
+import FigureLeft from 'src/figure-left'
+import SVG from 'src/svg'
+import Brand from 'src/brand'
+
+export {default as theme} from "src/ververica"
+export const themes = [
+	highlight,
+]
+
+<Head>
+	<title>Working with State</title>
+</Head>
+
+<Title>
+
+# Working with State
+## Apache Flink<sup>&reg;</sup> Training
+
+<Brand />
+
+</Title>
+
+---
+
+# Stateful Functions
+
+* All DataStream functions can be stateful
+* Flink takes care of making the state it manages
+  - fault tolerant
+  - rescalable
+  - queryable
+
+<Notes>
+
+Lorem ipsum. More and more notes.
+
+Notes _can_ be styled.
+
+* point one
+* two
+* CCC
+
+</Notes>
+
+---
+
+# Distributed Stateful Stream Processing
+
+<FigureLeft>
+
+![](/images/keyby-with-state.svg)
+
+* With keyed streams, processing and state are both partitioned **by the same key**
+* All state is therefore **local**
+* State can be on-heap, or off-heap in local-disk-backed storage
+
+</FigureLeft>
+
+---
+
+<Section>
+
+# Rich Functions
+
+</Section>
+
+---
+
+# Rich Functions
+
+* Function interfaces have just one method
+  - Single abstract method (SAM)
+  - Support for Java8 lambda functions
+
+* There is a _Rich_ variant of each function type
+  - e.g., `RichFlatMapFunction`
+  - Additional methods
+    + `open()`
+    + `close()`
+    + `getRuntimeContext()`
+
+---
+
+# Runtime Context
+
+* Has many useful methods, such as
+  - `getIndexOfThisSubtask()`
+  - `getNumberOfParallelSubtasks()`
+  - `getExecutionConfig()`
+
+* Provides access to key-partitioned state via `getState()`
+
+---
+
+<Section>
+
+# Managed, Key-partitioned State
+
+</Section>
+
+---
+
+# Example — Deduplication
+
+```java
+private static class Event {
+  public final String key;
+  public final long timestamp;
+  ...
+}
+
+public static void main(String[] args) throws Exception {
+  StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
+  
+  env.addSource(new EventSource())
+	.keyBy(e -> e.key)
+	.flatMap(new Deduplicate())
+	.print();
+  
+  env.execute();
+}
+```
+
+---
+
+```java
+public static class Deduplicate extends RichFlatMapFunction<Event, Event> {
+	ValueState<Boolean> seen;
+
+	@Override
+	public void open(Configuration conf) {
+		ValueStateDescriptor<Boolean> desc = new ValueStateDescriptor<>("seen", Types.BOOLEAN);
+		seen = getRuntimeContext().getState(desc);
+	}
+
+	@Override
+	public void flatMap(Event event, Collector<Event> out) throws Exception {
+		if (seen.value() == null) {
+			out.collect(event);
+			seen.update(true);
+		}
+	}
+}
+```
+
+---
+
+# Types of Keyed State
+
+* `ValueState<T>`
+* `ListState<T>`
+* `MapState<UK, UV>`
+* `ReducingState<T>`
+* `AggregatingState<IN, OUT>`
+
+---
+
+# When is State Garbage Collected?
+## By default, Flink retains the state it manages forever
+
+* Timers can be used with a ProcessFunction to clear state
+* Or use `StateTtlConfig` to specify when Flink should clear the state
+
+---
+
+<Section>
+
+# Connected Streams
+
+</Section>
+
+---
+
+# Connected Streams
+
+* Connect two streams to process them together
+* Connected streams can share state
+* The two streams must be keyed in compatible ways
+
+<SVG width={'60%'} src="/images/connected-streams.svg" />
+
+---
+
+# Stateful FlatMap on Connected Streams
+
+```java
+public class StreamingJob {
+	public static void main(String[] args) throws Exception {
+		StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
+		
+		DataStream<String> control = env.fromElements("DROP", "IGNORE").keyBy(x -> x);
+		DataStream<String> data = env.fromElements("Flink", "DROP", "Forward", "IGNORE").keyBy(x -> x);
+	
+		control
+			.connect(data)
+			.flatMap(new ControlFunction())
+			.print();
+	
+	    env.execute();
+	}
+}
+```
+
+---
+
+```java
+public static class ControlFunction extends RichCoFlatMapFunction<String, String, String> {
+    private ValueState<Boolean> blocked;
+    
+    @Override
+    public void open(Configuration config) {
+        blocked = getRuntimeContext().getState(new ValueStateDescriptor<>("blocked", Boolean.class));
+    }
+    
+	@Override  
+	public void flatMap1(String controlValue, Collector<String> out) throws Exception {
+        blocked.update(Boolean.TRUE);
+	}
+	
+	@Override
+	public void flatMap2(String dataValue, Collector<String> out) throws Exception {
+		if (blocked.value() == null) {
+			out.collect(dataValue);
+		}
+	}
+}
+```
+
+---
+
+<FullScreen>
+
+![](/images/ververica-vertical.png)
+
+</FullScreen>

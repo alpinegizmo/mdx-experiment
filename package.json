@@ -1,0 +1,20 @@
+{
+  "name": "mdx-experiment",
+  "version": "1.0.0",
+  "main": "index.js",
+  "author": "David Anderson",
+  "license": "",
+  "dependencies": {
+    "code-surfer": "github:pomber/code-surfer#code-surfer-v2"
+  },
+  "scripts": {
+    "start": "mdx-deck deck.mdx",
+    "build": "mdx-deck build deck.mdx",
+    "pdf": "mdx-deck pdf deck.mdx"
+  },
+  "devDependencies": {
+    "mdx-deck": "^2.3.2",
+    "raw-loader": "^2.0.0",
+    "styled-components": "^4.2.0"
+  }
+}

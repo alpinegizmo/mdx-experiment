@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:xl="http://www.w3.org/1999/xlink" version="1.1" xmlns="http://www.w3.org/2000/svg" viewBox="31.909594 207.4795 587.52214 172.43312" width="587.52214" height="172.43312">
+  <defs>
+    <font-face font-family="Helvetica Neue" font-size="16" panose-1="2 0 5 3 0 0 0 2 0 4" units-per-em="1000" underline-position="-100" underline-thickness="50" slope="0" x-height="517" cap-height="714" ascent="951.9958" descent="-212.99744" font-weight="400">
+      <font-face-src>
+        <font-face-name name="HelveticaNeue"/>
+      </font-face-src>
+    </font-face>
+  </defs>
+  <metadata> Produced by OmniGraffle 7.10.2 
+    <dc:date>2019-02-19 13:47:01 +0000</dc:date>
+  </metadata>
+  <g id="Canvas_1" stroke="none" fill="none" fill-opacity="1" stroke-dasharray="none" stroke-opacity="1">
+    <title>Canvas 1</title>
+    <g id="Canvas_1: Layer 1">
+      <title>Layer 1</title>
+      <g id="Graphic_2">
+        <ellipse cx="206.12546" cy="328.50554" rx="51.5916676160388" ry="50.9071646772535" fill="#eacb70"/>
+        <ellipse cx="206.12546" cy="328.50554" rx="51.5916676160388" ry="50.9071646772535" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+      </g>
+      <g id="Graphic_3">
+        <path d="M 32.409594 338.6219 L 32.409594 318.38917 L 109.97358 318.38917 L 109.97358 304.71218 L 140.75092 328.50554 L 109.97358 352.2989 L 109.97358 338.6219 Z" fill="#ccc"/>
+        <path d="M 32.409594 338.6219 L 32.409594 318.38917 L 109.97358 318.38917 L 109.97358 304.71218 L 140.75092 328.50554 L 109.97358 352.2989 L 109.97358 338.6219 Z" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+      </g>
+      <g id="Graphic_4">
+        <path d="M 271.5 338.6219 L 271.5 318.38917 L 349.064 318.38917 L 349.064 304.71218 L 379.84133 328.50554 L 349.064 352.2989 L 349.064 338.6219 Z" fill="#ccc"/>
+        <path d="M 271.5 338.6219 L 271.5 318.38917 L 349.064 318.38917 L 349.064 304.71218 L 379.84133 328.50554 L 349.064 352.2989 L 349.064 338.6219 Z" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+      </g>
+      <g id="Graphic_6">
+        <path d="M 67.607815 232.25743 L 78.62735 215.28884 L 139.35199 254.72388 L 146.80101 243.25339 L 159.65427 279.97072 L 120.88343 283.16296 L 128.33245 271.69247 Z" fill="#eae8eb"/>
+        <path d="M 67.607815 232.25743 L 78.62735 215.28884 L 139.35199 254.72388 L 146.80101 243.25339 L 159.65427 279.97072 L 120.88343 283.16296 L 128.33245 271.69247 Z" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+        <text transform="translate(82.75733 218.10962) rotate(33)" fill="black">
+          <tspan font-family="Helvetica Neue" font-size="16" font-weight="400" fill="black" x="21.847585" y="15">control</tspan>
+        </text>
+      </g>
+      <g id="Graphic_7">
+        <ellipse cx="445.21587" cy="328.50554" rx="51.5916676160388" ry="50.9071646772535" fill="#eacb70"/>
+        <ellipse cx="445.21587" cy="328.50554" rx="51.5916676160388" ry="50.9071646772535" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+      </g>
+      <g id="Graphic_8">
+        <path d="M 306.28182 224.9481 L 317.30136 207.9795 L 382.352 250.22388 L 389.801 238.75339 L 402.65427 275.47072 L 363.88343 278.66296 L 371.33245 267.19247 Z" fill="#eae8eb"/>
+        <path d="M 306.28182 224.9481 L 317.30136 207.9795 L 382.352 250.22388 L 389.801 238.75339 L 402.65427 275.47072 L 363.88343 278.66296 L 371.33245 267.19247 Z" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+        <text transform="translate(321.43133 210.8003) rotate(33)" fill="black">
+          <tspan font-family="Helvetica Neue" font-size="16" font-weight="400" fill="black" x="9.154664" y="15">enrichment</tspan>
+        </text>
+      </g>
+      <g id="Graphic_9">
+        <path d="M 510.5904 338.6219 L 510.5904 318.38917 L 588.1544 318.38917 L 588.1544 304.71218 L 618.9317 328.50554 L 588.1544 352.2989 L 588.1544 338.6219 Z" fill="#ccc"/>
+        <path d="M 510.5904 338.6219 L 510.5904 318.38917 L 588.1544 318.38917 L 588.1544 304.71218 L 618.9317 328.50554 L 588.1544 352.2989 L 588.1544 338.6219 Z" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+      </g>
+    </g>
+  </g>
+</svg>
