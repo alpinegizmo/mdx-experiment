@@ -12,22 +12,7 @@ const heightOfLogo = 32
 const logoPadding = 14
 const footerHeight = heightOfLogo + 2 * logoPadding
 
-const fullscreen = kids => {
-  try {
-    if ((kids.type.name === 'FullScreen') || (kids.type.name === 'Title')) return true
-  } catch (error) {}
-
-  try {
-    return kids.some((child) => {
-      return (child.type.name === 'FullScreen') || (child.type.name === 'Title')
-    })
-  } catch(error) {
-    return false
-  }
-}
-
 const Provider = props => {
-  const fullscreenSlide = fullscreen(props.slides[props.index](props.metadata).props.children) || props.mode === 'presenter'
   return <div>
     <div
       css={{
@@ -36,39 +21,40 @@ const Provider = props => {
       }}
     >
       {props.children}
-    </div>
-    <div
-        css={{
-          position: 'fixed',
-          bottom: 0,
-          left: 0,
-          width: '100vw',
-          height: footerHeight,
-          display: fullscreenSlide ? 'none' : 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          background: white,
-        }}
-    >
       <div
-        css={{
-          marginLeft: logoPadding,
-          color: ververicaLight,
-        }}
+          css={{
+            position: 'fixed',
+            bottom: 0,
+            left: 0,
+            width: '100vw',
+            height: footerHeight,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            background: white,
+            zIndex: 100,
+          }}
       >
-        <p>{props.index > 0 ? props.index + ' :' : ''} Copyright &copy; 2019 Ververica</p>
-      </div>
-      <div
-        css={{
-          position: 'relative',
-          marginRight: logoPadding,
-          width: heightOfLogo,
-          height: heightOfLogo,
-          backgroundImage: "url(/images/avvDS-JR_400x400.png)",
-          backgroundSize: '100%',
-          backgroundRepeat: 'no-repeat',
-        }}
-      >
+        <div
+          css={{
+            marginLeft: logoPadding,
+            color: ververicaLight,
+          }}
+        >
+          <p>{props.index > 0 ? props.index + ' :' : ''} Copyright &copy; 2019 Ververica</p>
+        </div>
+        <div
+          css={{
+            position: 'relative',
+            marginRight: logoPadding,
+            width: heightOfLogo,
+            height: heightOfLogo,
+            backgroundImage: "url(/images/avvDS-JR_400x400.png)",
+            backgroundSize: '100%',
+            backgroundRepeat: 'no-repeat',
+          }}
+        >
+        </div>
       </div>
     </div>
   </div>
@@ -90,6 +76,10 @@ export default {
     fontSize: '1.5em',
     '@media screen and (min-width:64em)': {
       fontSize: '2.5em',
+    },
+    '@media print': {
+      width: '1600px',
+      height: '900px',
     },
   },
   pre: {fontSize: '0.5em'},

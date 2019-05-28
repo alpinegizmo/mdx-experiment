@@ -60,6 +60,7 @@ export const FullScreen = props => {
     const kids = React.Children.toArray(props.children)
     return <Break className='fullscreen' css={{
         backgroundColor: ververica.ververicaBlue,
+        zIndex: 10000,
     }}>
         { kids }
     </Break>

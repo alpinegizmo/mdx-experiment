@@ -12,6 +12,7 @@ export default props => (
         alignItems: 'center',
         justifyContent: 'flex-end',
         background: ververica.white,
+        zIndex: 10000,
   }}>
       <img
         src='/images/ververica.png'

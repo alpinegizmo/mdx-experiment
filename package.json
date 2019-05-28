@@ -5,12 +5,11 @@
   "author": "David Anderson",
   "license": "",
   "dependencies": {
-    "code-surfer": "github:pomber/code-surfer#code-surfer-v2"
   },
   "scripts": {
     "start": "mdx-deck deck.mdx",
     "build": "mdx-deck build deck.mdx",
-    "pdf": "mdx-deck pdf deck.mdx"
+    "pdf": "mdx-deck-export -w 1600 -h 900 pdf deck.mdx"
   },
   "devDependencies": {
     "mdx-deck": "^2.3.2",
