@@ -28,7 +28,7 @@ const Provider = props => {
             left: 0,
             width: '100vw',
             height: footerHeight,
-            display: 'flex',
+            display: (props.mode === 'presenter' ? 'none' : 'flex'),
             alignItems: 'center',
             justifyContent: 'space-between',
             background: white,
