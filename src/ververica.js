@@ -82,7 +82,7 @@ export default {
       height: '900px',
     },
   },
-  pre: {fontSize: '0.5em'},
+  pre: {fontSize: '0.55em'},
   h1: {
     fontWeight: 600,
     fontSize: '1.5em',

@@ -25,3 +25,4 @@ flink-runtime-web/web-dashboard/bower_components/
 atlassian-ide-plugin.xml
 node_modules
 yarn.lock
+dist

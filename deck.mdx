@@ -21,17 +21,29 @@ export const themes = [
 ]
 
 <Head>
-	<title>Working with State</title>
+	<title>State</title>
 </Head>
 
 <Title>
 
-# Working with State
+# Stateful Stream Processing
 ## Apache Flink<sup>&reg;</sup> Training
 
 <Brand />
 
 </Title>
+
+<Notes>
+
+_Simple motivating example_: you want to do something special the first time you process an event for each user. 
+
+This obviously requires some state. You could say, “Ok, I can keep that state in a local variable."
+
+But we are dealing with distributed systems here, where as systems scale, it becomes increasingly likely that something will fail. But even if you assume your app never fails, what about redeployments?
+
+Furthermore, in a cluster, you will need each node to maintain a key/value map of state for the users that that node is responsible for, and have some way to redistribute the state when scaling the cluster up and down.
+
+</Notes>
 
 ---
 
@@ -45,29 +57,40 @@ export const themes = [
 
 <Notes>
 
-Lorem ipsum. More and more notes.
+*Fault tolerance* is the main reason you want flink to manage state, but there are additional benefits.
 
-Notes _can_ be styled.
+*Rescaling*: You can think of the state in flink as being a sharded, key/value store, and as you add and remove nodes from your cluster, it is necessary to re-shard, or re-distribute the state across the cluster. Flink takes care of this for you.
 
-* point one
-* two
-* CCC
+Also, Flink state can be *queried* using a REST API.
 
 </Notes>
 
 ---
 
-# Distributed Stateful Stream Processing
+# Distributed Stateful Streaming
 
 <FigureLeft>
 
 ![](/images/keyby-with-state.svg)
 
-* With keyed streams, processing and state are both partitioned **by the same key**
-* All state is therefore **local**
-* State can be on-heap, or off-heap in local-disk-backed storage
+* With keyed streams, processing and state are both partitioned **_by the same key_**
+* All state is therefore **_local_**
+* State can be either on-heap, or off-heap in local-disk-backed storage
 
 </FigureLeft>
+
+<Notes>
+
+We saw a version of this diagram earlier, when we introduced keyBy.
+
+KeyBy works hand-in-hand with stateful stream processing. For example, consider the case where we want to trigger a special action when we see a new user for the first time. 
+
+We can only do this if we are guaranteed that every event for a given user will be processed by an operator that will see every event for that user.
+
+* all data for a given key is processed by a single node
+* state is only accessible within the function/operator that defines it
+
+</Notes>
 
 ---
 
@@ -92,6 +115,16 @@ Notes _can_ be styled.
     + `close()`
     + `getRuntimeContext()`
 
+<Notes>
+
+We’ve already seen several functional interfaces: filter, map, flatMap
+
+These each have a single method.
+
+There are variations of each of these interfaces which can be made stateful. These are called rich functions.
+
+</Notes>
+
 ---
 
 # Runtime Context
@@ -103,6 +136,14 @@ Notes _can_ be styled.
 
 * Provides access to key-partitioned state via `getState()`
 
+<Notes>
+
+The runtime context is the gateway to accessing all sorts of interesting information about the environment in which your job is running.
+
+But for now, all we care about is that it gives us access to the state backend, which is where Flink's managed state is stored.
+
+</Notes>
+
 ---
 
 <Section>
@@ -110,6 +151,14 @@ Notes _can_ be styled.
 # Managed, Key-partitioned State
 
 </Section>
+
+<Notes>
+
+We are about to look at an example showing how to work with Flink's key-partitioned state. 
+
+You should be aware that this isn't the only kind of state Flink can manage for you -- there's also something called non-keyed state, which is sometimes also called operator state -- but in this course we are only going to look at keyed state because this is by far the generally useful.
+
+</Notes>
 
 ---
 
@@ -126,35 +175,89 @@ public static void main(String[] args) throws Exception {
   StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
   
   env.addSource(new EventSource())
-	.keyBy(e -> e.key)
-	.flatMap(new Deduplicate())
-	.print();
+    .keyBy(e -> e.key)
+    .flatMap(new Deduplicate())
+    .print();
   
   env.execute();
 }
 ```
 
+<Notes>
+
+Goal:
+  * deduplicate the stream
+  * only emit the first event for each key
+
+</Notes>
+
 ---
 
 ```java
 public static class Deduplicate extends RichFlatMapFunction<Event, Event> {
-	ValueState<Boolean> seen;
+  ValueState<Boolean> seen;
 
-	@Override
-	public void open(Configuration conf) {
-		ValueStateDescriptor<Boolean> desc = new ValueStateDescriptor<>("seen", Types.BOOLEAN);
-		seen = getRuntimeContext().getState(desc);
-	}
+  @Override
+  public void open(Configuration conf) {
+    ValueStateDescriptor<Boolean> desc = new ValueStateDescriptor<>("seen", Types.BOOLEAN);
+    seen = getRuntimeContext().getState(desc);
+  }
 
-	@Override
-	public void flatMap(Event event, Collector<Event> out) throws Exception {
-		if (seen.value() == null) {
-			out.collect(event);
-			seen.update(true);
-		}
-	}
+  @Override
+  public void flatMap(Event event, Collector<Event> out) throws Exception {
+    ...
+  }
 }
 ```
+
+<Notes>
+
+In order to setup Flink managed state, we need to:
+* use a Rich functiona
+* create a StateDescriptor that describes the data we want to store 
+* bind a local State variable to the state provided and handled by Flink
+
+Open is called during initialization, before this function processes any events.
+
+Our information is wrapped into a special Flink data type, called ValueState in this case. This is a kind of _keyed state_, meaning that Flink is prepared to store a Boolean value for each distinct key.
+
+</Notes>
+
+---
+
+```java
+public static class Deduplicate extends RichFlatMapFunction<Event, Event> {
+  ValueState<Boolean> seen;
+
+  @Override
+  public void open(Configuration conf) {
+    ValueStateDescriptor<Boolean> desc = new ValueStateDescriptor<>("seen", Types.BOOLEAN);
+    seen = getRuntimeContext().getState(desc);
+  }
+
+  @Override
+  public void flatMap(Event event, Collector<Event> out) throws Exception {
+    if (seen.value() == null) {
+      out.collect(event);
+      seen.update(true);
+    }
+  }
+}
+```
+
+<Notes>
+
+Now let's look at the business logic in the flatmap method -- in order to deduplicate the stream, we are checking to see if we’ve already seen events for this key -- meaning, the key for the current event.
+
+To retrieve the state value, we call the .value() method. 
+
+To store a new value into state, we call .update().
+
+Now comes the part that this is often a source of confusion: when calling value and update we haven't had to specify the key. Before the framework calls the flatmap() method, it has automatically scoped state accesses to the key for the event that is being processed.
+
+So to reiterate: we have asked Flink to manage state for us, meaning that it will be fault tolerant and survive crashes of the individual instances. 
+
+</Notes>
 
 ---
 
@@ -166,13 +269,37 @@ public static class Deduplicate extends RichFlatMapFunction<Event, Event> {
 * `ReducingState<T>`
 * `AggregatingState<IN, OUT>`
 
+<Notes>
+
+In this example we used the simplest and most general-purpose of the types of keyed state that Flink provides, but there are several others.
+
+ValueState&lt;List&gt;  ->  use ListState&lt;Value&gt;, because it it better optimized.
+
+MapState: also scoped by the key! This is a nested map. Useful if you want to store an open-ended properties hash for each key. More efficient than ValueState&lt;HashMap&gt;.
+
+ReducingState or AggregatingState exist because they are convenient to have in the implementation of Flink - you can use them too.
+
+</Notes>
+
 ---
 
 # When is State Garbage Collected?
 ## By default, Flink retains the state it manages forever
 
 * Timers can be used with a ProcessFunction to clear state
-* Or use `StateTtlConfig` to specify when Flink should clear the state
+  - We'll see an example of this later
+* `StateTtlConfig` can be used to specify when Flink should clear the state automatically
+  - Specified via the state descriptor
+  - Specified in processing time, not event time (WIP)
+  - Can be cleared based on time since last write, or last write/read
+
+<Notes>
+
+This StateTtlConfig feature was added in 1.6 and updated in 1.8. Some users may not have access to it yet.
+
+Specifying a state retention interval in event time is work-in-progress.
+
+</Notes>
 
 ---
 
@@ -191,6 +318,15 @@ public static class Deduplicate extends RichFlatMapFunction<Event, Event> {
 * The two streams must be keyed in compatible ways
 
 <SVG width={'60%'} src="/images/connected-streams.svg" />
+
+<Notes>
+
+It is a very frequent use case: you would like to connect to streams together and process events of both, influencing each other.
+Such connected streams can share state.
+
+Because the state that they share is keyed, both streams have to be keyed using the same key space. (It wouldn't make sense to key one stream by user_id, and another by account_id, for example.)
+
+</Notes>
 
 ---
 
@@ -213,6 +349,16 @@ public class StreamingJob {
 	}
 }
 ```
+
+<Notes>
+
+Let’s say we have some upstream system dynamically telling us which values have to be filtered out of the data stream.
+
+Notice that both streams have been keyed by the entire stream record, which is just a string.
+
+We connect the streams and apply a custom ControlFunction.
+
+</Notes>
 
 ---
 
@@ -238,6 +384,20 @@ public static class ControlFunction extends RichCoFlatMapFunction<String, String
 	}
 }
 ```
+
+<Notes>
+
+A RichCoFlatMapFunction, where Rich implies access to state, and Co means that this function is applied to the events of a connected stream. We need to implement not just one, but two flatMap functions, corresponding to the arrival of events of the two connected streams.
+
+When we receive events of the control stream, which are words we should block, we just store a boolean flag. Both streams are keyed by the same key - the actual word. This guarantees that when this word arrives on the data stream, we will access this same flag and only pass through words that haven't been blocked.
+
+IMPORTANT: The two streams can race against each other. You have no control over the timing of when the elements of those streams get processed. Later we will talk about mechanisms that Flink provides in order to get some determinism of the processing order. 
+
+Present the exercise. 
+
+Leave this slide on the projector during the exercise. 
+
+</Notes>
 
 ---
 
